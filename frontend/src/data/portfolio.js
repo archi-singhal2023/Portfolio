@@ -89,7 +89,26 @@ export const PROJECTS = [
       { value: "MMR", label: "Retrieval strategy" },
       { value: "CI/CD", label: "Automated deploys" },
     ],
-    links: { github: "https://github.com/archi-singhal2023", demo: null, paper: "#" },
+    links: { github: "https://github.com/archi-singhal2023/RAG-Based-Knowledge", demo: "https://huggingface.co/spaces/Archi-01/Documind-space?logs=container", paper: "https://journals.mriindia.com/index.php/ijacect/article/view/2347" },
+  },
+  {
+    index: "03",
+    name: "AI Photo Booth",
+    voiceSummary:
+      "This is Archi's AI Photo Booth — a real-time computer vision app that snaps photos using blink and hand-gesture detection with MediaPipe, then builds a polaroid-style strip. It runs fully hands-free with a voice-guided countdown, no button clicks needed.",
+    period: "2025",
+    status: "CV",
+    problem:
+      "Photo booths need manual clicking, which breaks the moment. Objective: a hands-free, gesture-driven booth that captures candid shots automatically and packages them into a shareable polaroid strip.",
+    architecture:
+      "Real-time pipeline using MediaPipe Face Mesh for blink detection and MediaPipe Hands for finger gestures, orchestrated with OpenCV for the camera feed and a Tkinter UI. A blink triggers the shutter, a raised finger switches filters, and three captures are composited into a stylized polaroid strip with an audio countdown.",
+    stack: ["Python", "OpenCV", "MediaPipe", "Face Mesh", "Computer Vision", "Tkinter"],
+    metrics: [
+      { value: "Hands-free", label: "Gesture capture" },
+      { value: "Real-time", label: "Blink + finger detect" },
+      { value: "Polaroid", label: "Auto strip output" },
+    ],
+    links: { github: "https://github.com/archi-singhal2023/AI-Photo-Booth", demo: null, paper: null },
   },
 ];
 

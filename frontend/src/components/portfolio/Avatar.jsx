@@ -173,14 +173,6 @@ export const Avatar = () => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={replay}
-            data-testid="avatar-replay"
-            className="rounded-full border border-white/15 bg-black/50 p-2 text-zinc-300 backdrop-blur-md transition-colors hover:border-[#00FF94]/50 hover:text-[#00FF94]"
-            aria-label="Replay greeting"
-          >
-            <Play size={13} />
-          </button>
-          <button
             onClick={toggleMute}
             data-testid="avatar-mute"
             className="rounded-full border border-white/15 bg-black/50 p-2 text-zinc-300 backdrop-blur-md transition-colors hover:border-[#00FF94]/50 hover:text-[#00FF94]"
