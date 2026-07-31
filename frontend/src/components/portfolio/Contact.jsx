@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, Send, Loader2, Check, FileText, ArrowUpRight } from "lucide-react";
+import { Github, Linkedin, Mail, Send, Loader2, Check, FileText, ArrowUpRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PROFILE } from "../../data/portfolio";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-const ICONS = { Github, Linkedin, Mail };
+const ICONS = { Github, Linkedin, Mail, Sparkles };
 
 export const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });

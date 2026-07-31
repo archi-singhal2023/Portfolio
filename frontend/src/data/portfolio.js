@@ -6,12 +6,16 @@ export const PROFILE = {
   location: "Raipur, India",
   email: "singhalarchi583@gmail.com",
   resumeUrl: "/Archi_Singhal_Resume.pdf",
-  headlineLines: ["GENERATIVE AI", "& AGENTIC", "SYSTEMS."],
+  badge: "OPEN TO WORK",
+  headlineName: "ARCHI",
+  subtitle: "Aspiring AI/ML Engineer",
   valueProp:
-    "B.Tech AI/ML engineer building autonomous multi-agent pipelines, production RAG systems, and NLP tooling — from research paper to deployed API.",
+    "AI/ML Engineer & GenAI Architect — Building end-to-end intelligent systems, RAG platforms, and production-grade Computer Vision pipelines.",
+  heroTags: ["Python", "PyTorch", "TensorFlow", "AWS", "RAG", "GenAI/LLMs", "MLOps"],
   socials: [
     { label: "GitHub", handle: "archi-singhal2023", url: "https://github.com/archi-singhal2023", icon: "Github" },
     { label: "LinkedIn", handle: "archi-singhal", url: "https://www.linkedin.com/in/archi-singhal-803489253/", icon: "Linkedin" },
+    { label: "Hugging Face", handle: "@archi", url: "#", icon: "Sparkles" },
     { label: "Email", handle: "singhalarchi583@gmail.com", url: "mailto:singhalarchi583@gmail.com", icon: "Mail" },
   ],
 };
