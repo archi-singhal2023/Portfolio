@@ -131,7 +131,6 @@ export const PLAYGROUND_SUGGESTIONS = [
 export const LANGUAGES = [
   { key: "english", label: "English" },
   { key: "hindi", label: "हिंदी" },
-  { key: "hinglish", label: "Hinglish" },
   { key: "tamil", label: "தமிழ்" },
   { key: "telugu", label: "తెలుగు" },
   { key: "kannada", label: "ಕನ್ನಡ" },
@@ -140,5 +139,5 @@ export const LANGUAGES = [
 ];
 
 export const AVATAR_INTRO =
-  "Welcome to the portfolio of Archi — an AI/ML Engineer. A creative mind with a strong teamwork spirit, Archi is looking for opportunities to apply her knowledge to solve real-world problems.";
+  "Welcome to the portfolio of Archi, an AI/ML Engineer. A creative mind with a strong teamwork spirit, Archi is looking for opportunities to apply her knowledge to solve real-world problems.";
 
