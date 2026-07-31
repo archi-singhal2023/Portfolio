@@ -59,7 +59,8 @@ export const Navbar = () => {
           ))}
           <a
             href={PROFILE.resumeUrl}
-            download
+            target="_blank"
+            rel="noopener noreferrer"
             data-testid="nav-resume-btn"
             className="border border-[#00FF94] px-4 py-2 font-mono text-xs uppercase tracking-[0.15em] text-[#00FF94] transition-colors hover:bg-[#00FF94] hover:text-black"
           >
@@ -97,11 +98,12 @@ export const Navbar = () => {
               ))}
               <a
                 href={PROFILE.resumeUrl}
-                download
+                target="_blank"
+                rel="noopener noreferrer"
                 data-testid="nav-mobile-resume"
                 className="mt-2 border border-[#00FF94] px-4 py-3 text-center font-mono text-sm uppercase tracking-[0.15em] text-[#00FF94]"
               >
-                Download Resume
+                View Resume
               </a>
             </div>
           </motion.div>

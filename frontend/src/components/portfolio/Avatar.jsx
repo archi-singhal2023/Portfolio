@@ -271,7 +271,7 @@ export const Avatar = () => {
         <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,transparent_55%,rgba(5,5,5,0.7)_100%)]" />
 
         <motion.img
-          src="/avatar.png"
+          src="/avatar.png?v=2"
           alt="Archi's AI assistant"
           className="relative z-[1] w-full"
           style={{

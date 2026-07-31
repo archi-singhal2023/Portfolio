@@ -5,7 +5,7 @@ export const PROFILE = {
   role: "AI/ML Engineer",
   location: "Raipur, India",
   email: "singhalarchi583@gmail.com",
-  resumeUrl: "/Archi_Singhal_Resume.pdf",
+  resumeUrl: "https://drive.google.com/file/d/1y5-U6qjV5twincrkOAJFqvotMqpbAEB1/view?usp=sharing",
   badge: "OPEN TO WORK",
   headlineName: "ARCHI",
   subtitle: "Aspiring AI/ML Engineer",

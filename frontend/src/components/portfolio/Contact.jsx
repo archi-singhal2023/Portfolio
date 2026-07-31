@@ -146,11 +146,12 @@ export const Contact = () => {
 
             <a
               href={PROFILE.resumeUrl}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               data-testid="contact-resume-download"
               className="flex items-center justify-center gap-3 border border-[#00FF94] py-5 font-mono text-xs uppercase tracking-[0.15em] text-[#00FF94] transition-colors hover:bg-[#00FF94] hover:text-black"
             >
-              <FileText size={16} /> Download Résumé (PDF)
+              <FileText size={16} /> View Résumé (PDF)
             </a>
           </motion.div>
         </div>

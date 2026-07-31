@@ -112,7 +112,8 @@ export const Hero = () => {
           </button>
           <a
             href={PROFILE.resumeUrl}
-            download
+            target="_blank"
+            rel="noopener noreferrer"
             data-testid="hero-read-resume"
             className="flex items-center gap-2 border border-white/20 px-7 py-4 font-mono text-xs uppercase tracking-[0.15em] text-white transition-colors hover:border-[#00FF94] hover:text-[#00FF94]"
           >

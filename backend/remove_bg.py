@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage
 
-src = "/app/frontend/public/avatar.png"
+src = "/tmp/newavatar.webp"
 img = Image.open(src).convert("RGBA")
 arr = np.array(img)
 rgb = arr[:, :, :3].astype(np.int16)
