@@ -10,12 +10,11 @@ export const PROFILE = {
   headlineName: "ARCHI",
   subtitle: "Aspiring AI/ML Engineer",
   valueProp:
-    "AI/ML Engineer & GenAI Architect — Building end-to-end intelligent systems, RAG platforms, and production-grade Computer Vision pipelines.",
+    "Python-first AI/ML engineer specializing in Agentic AI & multi-agent systems — architecting autonomous LLM pipelines, production RAG platforms, and intelligent tooling that solves real-world problems.",
   heroTags: ["Python", "PyTorch", "TensorFlow", "AWS", "RAG", "GenAI/LLMs", "MLOps"],
   socials: [
     { label: "GitHub", handle: "archi-singhal2023", url: "https://github.com/archi-singhal2023", icon: "Github" },
     { label: "LinkedIn", handle: "archi-singhal", url: "https://www.linkedin.com/in/archi-singhal-803489253/", icon: "Linkedin" },
-    { label: "Hugging Face", handle: "@archi", url: "#", icon: "Sparkles" },
     { label: "Email", handle: "singhalarchi583@gmail.com", url: "mailto:singhalarchi583@gmail.com", icon: "Mail" },
   ],
 };
@@ -57,6 +56,8 @@ export const PROJECTS = [
   {
     index: "01",
     name: "Multi-Agent AI News Explainer",
+    voiceSummary:
+      "This is Archi's Multi-Agent AI News Explainer — a six-agent pipeline that autonomously discovers news, verifies sources, and writes balanced explainers. It's deployed live on Render with dynamic, runtime query planning to optimize API usage.",
     period: "Jul 2026 — Present",
     status: "LIVE",
     problem:
@@ -74,6 +75,8 @@ export const PROJECTS = [
   {
     index: "02",
     name: "RAG-Based Knowledge Management System",
+    voiceSummary:
+      "This is Archi's RAG Knowledge Management System — a production PDF question-answering app built with LangChain and ChromaDB, using MMR retrieval for source-backed answers. The research behind it was published in the IJACECT journal in 2026.",
     period: "Jan 2026 — Mar 2026",
     status: "PUBLISHED",
     problem:
@@ -123,3 +126,19 @@ export const PLAYGROUND_SUGGESTIONS = [
   "Why MMR retrieval over standard similarity?",
   "What's Archi's strongest skill area?",
 ];
+
+// Avatar assistant config
+export const LANGUAGES = [
+  { key: "english", label: "English" },
+  { key: "hindi", label: "हिंदी" },
+  { key: "hinglish", label: "Hinglish" },
+  { key: "tamil", label: "தமிழ்" },
+  { key: "telugu", label: "తెలుగు" },
+  { key: "kannada", label: "ಕನ್ನಡ" },
+  { key: "odia", label: "ଓଡ଼ିଆ" },
+  { key: "bengali", label: "বাংলা" },
+];
+
+export const AVATAR_INTRO =
+  "Welcome to the portfolio of Archi — an AI/ML Engineer. A creative mind with a strong teamwork spirit, Archi is looking for opportunities to apply her knowledge to solve real-world problems.";
+

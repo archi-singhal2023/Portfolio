@@ -1,20 +1,28 @@
 import { motion } from "framer-motion";
-import { Github, ExternalLink, FileText, Target, Cpu } from "lucide-react";
+import { Github, ExternalLink, FileText, Target, Cpu, Volume2 } from "lucide-react";
 import { PROJECTS } from "../../data/portfolio";
 import { SectionHeading } from "./SectionHeading";
+import { useAvatar } from "../../context/AvatarContext";
 
 const ProjectCard = ({ p }) => {
+  const { narrate } = useAvatar();
   return (
     <motion.article
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      onClick={() => narrate({ type: "project", project: p })}
       data-testid={`project-card-${p.index}`}
-      className="group relative overflow-hidden border border-white/10 bg-[#080808] transition-colors duration-500 hover:border-[#00FF94]/40"
+      className="group relative cursor-pointer overflow-hidden border border-white/10 bg-[#080808] transition-colors duration-500 hover:border-[#00FF94]/40"
     >
       {/* tracing top beam */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00FF94] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+      {/* hear-summary hint */}
+      <div className="pointer-events-none absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full border border-[#00FF94]/30 bg-black/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-[#00FF94] opacity-0 backdrop-blur transition-opacity duration-300 group-hover:opacity-100">
+        <Volume2 size={12} /> Click · ARIA explains
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12">
         {/* left: index + meta */}
@@ -75,7 +83,7 @@ const ProjectCard = ({ p }) => {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3 pt-2">
+            <div className="flex flex-wrap gap-3 pt-2" onClick={(e) => e.stopPropagation()}>
               {p.links.github && (
                 <a
                   href={p.links.github}

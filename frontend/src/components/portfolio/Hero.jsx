@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { ArrowDown, Github, Linkedin, Mail, FileText, Sparkles } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Mail, FileText } from "lucide-react";
 import { ParticleField } from "./ParticleField";
 import { PROFILE } from "../../data/portfolio";
 
-const ICONS = { Github, Linkedin, Mail, Sparkles };
+const ICONS = { Github, Linkedin, Mail };
 
 const lineVariants = {
   hidden: { y: "110%" },

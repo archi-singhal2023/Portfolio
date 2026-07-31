@@ -207,6 +207,100 @@ async def create_status_check(input: StatusCheck):
     return input
 
 
+SARVAM_API_KEY = os.environ.get('SARVAM_API_KEY')
+SARVAM_TTS_URL = "https://api.sarvam.ai/text-to-speech"
+SARVAM_SPEAKER = "priya"
+
+# language key -> (sarvam target_language_code, human name for translation, translate?)
+LANGUAGE_MAP = {
+    "english": ("en-IN", "English", False),
+    "hindi": ("hi-IN", "Hindi (Devanagari script)", True),
+    "tamil": ("ta-IN", "Tamil", True),
+    "telugu": ("te-IN", "Telugu", True),
+    "kannada": ("kn-IN", "Kannada", True),
+    "odia": ("od-IN", "Odia", True),
+    "bengali": ("bn-IN", "Bengali", True),
+    "hinglish": ("en-IN", "Hinglish (romanized Hindi mixed with English, written in Latin script)", True),
+}
+
+
+async def translate_text(text: str, language_name: str) -> str:
+    """Translate English source text into the target language using Claude."""
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"tts-translate-{uuid.uuid4()}",
+            system_message=(
+                "You are a professional translator. Translate the user's text into "
+                f"{language_name}. Output ONLY the translation, no quotes, no notes, "
+                "no transliteration in brackets. Keep proper nouns like 'Archi', "
+                "'AI/ML', 'RAG', 'Python' as-is."
+            ),
+        ).with_model("anthropic", "claude-sonnet-4-6")
+        result = await chat.send_message(UserMessage(text=text))
+        return (result or text).strip()
+    except Exception as e:
+        logger.error(f"Translation failed: {e}")
+        return text
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=1500)
+    language: str = "english"
+
+
+@api_router.post("/tts")
+async def text_to_speech(req: TTSRequest):
+    if not SARVAM_API_KEY:
+        raise HTTPException(status_code=503, detail="Voice not configured")
+
+    lang_key = req.language.lower()
+    target_code, lang_name, needs_translation = LANGUAGE_MAP.get(
+        lang_key, LANGUAGE_MAP["english"]
+    )
+
+    # cache by (source text + language) to avoid re-translating / re-synthesizing
+    cache_key = f"{lang_key}:{req.text}"
+    cached = await db.tts_cache.find_one({"key": cache_key}, {"_id": 0})
+    if cached:
+        return {"audio_base64": cached["audio"], "mime_type": "audio/wav", "spoken_text": cached["spoken_text"]}
+
+    spoken_text = req.text
+    if needs_translation:
+        spoken_text = await translate_text(req.text, lang_name)
+
+    payload = {
+        "text": spoken_text[:1500],
+        "target_language_code": target_code,
+        "model": "bulbul:v3",
+        "speaker": SARVAM_SPEAKER,
+        "pace": 1.0,
+        "temperature": 0.6,
+        "speech_sample_rate": "24000",
+        "output_audio_codec": "wav",
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=60) as http_client:
+            resp = await http_client.post(
+                SARVAM_TTS_URL,
+                headers={"api-subscription-key": SARVAM_API_KEY, "Content-Type": "application/json"},
+                json=payload,
+            )
+        resp.raise_for_status()
+        data = resp.json()
+        audio_b64 = data["audios"][0]
+    except httpx.HTTPStatusError as e:
+        logger.error(f"Sarvam TTS failed: {e.response.status_code} {e.response.text}")
+        raise HTTPException(status_code=502, detail="Voice synthesis failed")
+    except Exception as e:
+        logger.error(f"Sarvam TTS error: {e}")
+        raise HTTPException(status_code=500, detail="Voice synthesis error")
+
+    await db.tts_cache.insert_one({"key": cache_key, "audio": audio_b64, "spoken_text": spoken_text})
+    return {"audio_base64": audio_b64, "mime_type": "audio/wav", "spoken_text": spoken_text}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
