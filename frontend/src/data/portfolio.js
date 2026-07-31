@@ -70,7 +70,7 @@ export const PROJECTS = [
       { value: "Live", label: "Self-refreshing prod" },
       { value: "Runtime", label: "Dynamic query planning" },
     ],
-    links: { github: "https://github.com/archi-singhal2023", demo: "#", paper: null },
+    links: { github: "https://github.com/archi-singhal2023/News-Content-Agent", demo: "https://news-content-agent.onrender.com/", paper: null },
   },
   {
     index: "02",
