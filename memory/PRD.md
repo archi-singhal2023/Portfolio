@@ -23,7 +23,18 @@ Build a modern, high-converting, interactive AI/ML portfolio for Archi Singhal (
 - Working contact form (email + DB) with toast feedback, downloadable resume PDF
 - Fully responsive, dark mode. Tested 100% pass (iteration_1).
 
+### Feature Round 2 (2025-12)
+- Hero restructured to reference layout: "OPEN TO WORK" badge, giant ARCHI name, "Aspiring AI/ML Engineer" subtitle, skill pills, button-style social links. Removed Hugging Face. Description now Python + Agentic AI focused.
+- Floating AI avatar assistant "ARIA" (transparent PNG cutout, glow, idle float, docks on scroll).
+- Time-based greeting + auto-speak on load (autoplay-blocked fallback: tap-to-hear + first-interaction trigger).
+- Sarvam AI multilingual TTS via backend proxy `/api/tts` (model bulbul:v3, speaker priya). Non-English auto-translated by Claude. Languages: English, Hindi, Hinglish, Tamil, Telugu, Kannada, Odia, Bengali. Mongo cache (tts_cache).
+- Language dropdown, replay, mute, speaking pulse rings.
+- Project narration: clicking a project card makes ARIA point/nod + speak a 2-sentence summary in the selected language.
+
+### KNOWN ISSUE
+- Emergent-managed email (Resend) key `EMERGENT_EMAIL_KEY` currently returns 401 "API key is invalid" (platform-side; worked in iter1, now rejected). Contact form now degrades gracefully: message is ALWAYS saved to Mongo (`contact_messages`) and returns success; email is best-effort (`email_sent` flag). Re-fetched playbook returns the same (invalid) key.
+
 ## Backlog / Next
-- P1: Add Hugging Face + Kaggle links when available; real GitHub demo/paper URLs
-- P2: Blog/writing section; project detail pages; view counter analytics
-- P2: Light "command palette" nav (Cmd+K)
+- P0: Restore email delivery (managed key) OR add an owner-only inbox page to read `contact_messages`.
+- P1: Real GitHub demo/paper URLs; Hugging Face + Kaggle when available.
+- P2: Project detail pages; Cmd+K command palette.

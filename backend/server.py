@@ -183,6 +183,7 @@ async def contact(req: ContactRequest):
         "contact_email": req.email,
     }
 
+    email_sent = False
     try:
         async with httpx.AsyncClient(timeout=30) as http_client:
             resp = await http_client.post(
@@ -191,12 +192,17 @@ async def contact(req: ContactRequest):
                 json=payload,
             )
         resp.raise_for_status()
+        email_sent = True
     except Exception as e:
-        logger.error(f"Contact email send failed: {e}")
-        # Message is saved even if email fails; surface a soft error
-        raise HTTPException(status_code=502, detail="Message saved but email delivery failed")
+        # Best-effort email: the message is already persisted in Mongo, so the
+        # visitor is never blocked if the managed email provider is unavailable.
+        logger.error(f"Contact email send failed (message still saved): {e}")
 
-    return {"status": "success", "message": "Thanks! Your message has been sent."}
+    return {
+        "status": "success",
+        "email_sent": email_sent,
+        "message": "Thanks! Your message has been received.",
+    }
 
 
 @api_router.post("/status", response_model=StatusCheck)

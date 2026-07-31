@@ -68,12 +68,16 @@ export const Avatar = () => {
     });
   }, [registerNarrator, doSpeak]);
 
-  // greeting on load (with autoplay fallback)
+  // greeting on load (with autoplay fallback). Scheduled every mount so React
+  // StrictMode's mount→cleanup→remount cycle doesn't drop the timer; greetedRef
+  // guards against speaking twice.
   useEffect(() => {
-    if (greetedRef.current) return;
-    greetedRef.current = true;
     setBubble(greetingText);
-    const t = setTimeout(() => doSpeak(greetingText), 1600);
+    const t = setTimeout(() => {
+      if (greetedRef.current) return;
+      greetedRef.current = true;
+      doSpeak(greetingText);
+    }, 1600);
 
     // if autoplay was blocked, play greeting on the first user interaction
     const onFirstInteract = () => {
