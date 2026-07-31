@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe, Volume2, VolumeX, Play, ChevronUp } from "lucide-react";
+import { Globe, Volume2, VolumeX, ChevronUp } from "lucide-react";
 import { LANGUAGES, AVATAR_INTRO } from "../../data/portfolio";
 import { speak, stopSpeaking } from "../../services/sarvamVoice";
 import { useAvatar } from "../../context/AvatarContext";
@@ -28,7 +28,6 @@ export const Avatar = () => {
   const [docked, setDocked] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [pointing, setPointing] = useState(false);
-  const [needsTap, setNeedsTap] = useState(false);
   const [muted, setMuted] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
 
@@ -42,26 +41,27 @@ export const Avatar = () => {
 
   const greetingText = `${timeGreeting()} ${AVATAR_INTRO}`;
 
-  // core speak routine (voice only — no on-screen transcript)
+  // core speak routine (voice only — no on-screen transcript).
+  // Returns true if playback actually started, false if it was blocked/failed.
   const doSpeak = useCallback(async (text, { point } = {}) => {
     lastTextRef.current = text;
     if (point) {
       setPointing(true);
       setTimeout(() => setPointing(false), 2600);
     }
-    if (mutedRef.current) return;
+    if (mutedRef.current) return true;
     try {
-      setNeedsTap(false);
       await speak(text, languageRef.current, {
         onStart: () => setSpeaking(true),
         onEnd: () => setSpeaking(false),
       });
+      return true;
     } catch (e) {
       setSpeaking(false);
       if (e && e.name === "NotAllowedError") {
-        setNeedsTap(true);
         autoplayBlockedRef.current = true;
       }
+      return false;
     }
   }, []);
 
@@ -74,25 +74,40 @@ export const Avatar = () => {
     });
   }, [registerNarrator, doSpeak]);
 
-  // greeting on load (with autoplay fallback)
+  // Greet automatically when the portfolio opens.
+  // 1) Try true autoplay shortly after load (works on browsers that allow it).
+  // 2) Browsers that block autoplay require a user gesture — so we also greet on
+  //    the FIRST interaction of ANY kind (mouse move, scroll, tap, key), which
+  //    happens almost immediately, making it feel automatic.
   useEffect(() => {
-    const t = setTimeout(() => {
+    const events = ["pointerdown", "mousemove", "wheel", "scroll", "keydown", "touchstart", "click"];
+
+    const removeAll = () => events.forEach((e) => window.removeEventListener(e, onInteract));
+
+    const greet = async () => {
       if (greetedRef.current) return;
       greetedRef.current = true;
-      doSpeak(greetingText);
-    }, 1600);
-
-    const onFirstInteract = () => {
-      if (autoplayBlockedRef.current && !mutedRef.current) {
-        autoplayBlockedRef.current = false;
-        setNeedsTap(false);
-        doSpeak(lastTextRef.current || greetingText);
+      const ok = await doSpeak(greetingText);
+      if (ok) {
+        removeAll();
+      } else {
+        // allow a later gesture to retry if this attempt was blocked
+        greetedRef.current = false;
       }
     };
-    window.addEventListener("pointerdown", onFirstInteract);
+
+    function onInteract() {
+      greet();
+    }
+
+    events.forEach((e) => window.addEventListener(e, onInteract, { passive: true }));
+
+    // attempt autoplay without any interaction
+    const t = setTimeout(() => { greet(); }, 700);
+
     return () => {
       clearTimeout(t);
-      window.removeEventListener("pointerdown", onFirstInteract);
+      removeAll();
     };
   }, []);
 
@@ -202,23 +217,6 @@ export const Avatar = () => {
               </motion.div>
             )}
           </AnimatePresence>
-
-          {needsTap && !speaking && (
-            <button
-              onClick={replay}
-              data-testid="avatar-tap-to-hear"
-              aria-label="Tap to hear greeting"
-              className="rounded-full border border-[#00FF94]/50 bg-[#00FF94]/10 p-2 text-[#00FF94]"
-            >
-              <motion.span
-                animate={{ scale: [1, 1.25, 1] }}
-                transition={{ duration: 1.2, repeat: Infinity }}
-                className="block"
-              >
-                <Play size={13} />
-              </motion.span>
-            </button>
-          )}
         </div>
       </div>
 
