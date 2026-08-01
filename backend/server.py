@@ -12,23 +12,20 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+from groq import AsyncGroq
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+groq_client = AsyncGroq(api_key=GROQ_API_KEY)
+
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
-# Integration keys
-EMERGENT_LLM_KEY = os.environ['EMERGENT_LLM_KEY']
-EMAIL_BASE_URL = "https://integrations.emergentagent.com"
-EMAIL_KEY = os.environ['EMERGENT_EMAIL_KEY']
-EMAIL_FROM_NAME = os.environ['EMAIL_FROM_NAME']
-OWNER_EMAIL = os.environ['OWNER_EMAIL']
+db = client[os.getenv("DB_NAME", "portfolio")]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -37,7 +34,6 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger(__name__)
 
 # ---------------- System prompt for the AI Playground ----------------
 PORTFOLIO_CONTEXT = """You are ARIA — Archi Singhal's AI assistant embedded in her portfolio website.
@@ -93,7 +89,7 @@ async def root():
 
 @api_router.post("/playground/chat")
 async def playground_chat(req: ChatRequest):
-    """Streaming AI playground powered by Claude Sonnet via Emergent LLM key."""
+    """Streaming AI playground powered by Groq (Llama 3.3)."""
     if not req.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
@@ -106,21 +102,28 @@ async def playground_chat(req: ChatRequest):
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
 
-    chat = LlmChat(
-        api_key=EMERGENT_LLM_KEY,
-        session_id=req.session_id,
-        system_message=PORTFOLIO_CONTEXT,
-    ).with_model("anthropic", "claude-sonnet-4-6")
-
     async def event_generator():
         full = ""
+        if not GROQ_API_KEY:
+            logger.warning("Playground chat skipped: GROQ_API_KEY not set")
+            yield f"data: {json.dumps({'error': 'AI playground is not configured'})}\n\n"
+            yield f"data: {json.dumps({'done': True})}\n\n"
+            return
         try:
-            async for event in chat.stream_message(UserMessage(text=req.message)):
-                if isinstance(event, TextDelta):
-                    full += event.content
-                    yield f"data: {json.dumps({'delta': event.content})}\n\n"
-                elif isinstance(event, StreamDone):
-                    break
+            stream = await groq_client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                max_tokens=1024,
+                messages=[
+                    {"role": "system", "content": PORTFOLIO_CONTEXT},
+                    {"role": "user", "content": req.message},
+                ],
+                stream=True,
+            )
+            async for chunk in stream:
+                delta = chunk.choices[0].delta.content
+                if delta:
+                    full += delta
+                    yield f"data: {json.dumps({'delta': delta})}\n\n"
         except Exception as e:
             logger.error(f"Playground stream error: {e}")
             yield f"data: {json.dumps({'error': 'AI stream failed'})}\n\n"
@@ -144,7 +147,7 @@ async def playground_chat(req: ChatRequest):
 
 @api_router.post("/contact")
 async def contact(req: ContactRequest):
-    """Save contact submission to DB and email the owner via Emergent Resend."""
+    """Save contact submission to DB. Email delivery is handled client-side via EmailJS."""
     doc = {
         "id": str(uuid.uuid4()),
         "name": req.name,
@@ -154,53 +157,8 @@ async def contact(req: ContactRequest):
     }
     await db.contact_messages.insert_one(doc)
 
-    html_content = f"""
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:32px;font-family:Arial,sans-serif;">
-      <tr><td>
-        <table width="600" cellpadding="0" cellspacing="0" align="center" style="background:#0f0f10;border:1px solid #1f1f1f;border-radius:12px;overflow:hidden;">
-          <tr><td style="background:#00FF94;padding:20px 28px;">
-            <span style="color:#000;font-size:18px;font-weight:bold;letter-spacing:1px;">NEW PORTFOLIO MESSAGE</span>
-          </td></tr>
-          <tr><td style="padding:28px;color:#e5e5e5;">
-            <p style="margin:0 0 8px;color:#00FF94;font-size:12px;letter-spacing:2px;text-transform:uppercase;">From</p>
-            <p style="margin:0 0 20px;font-size:16px;color:#fff;">{req.name} &lt;{req.email}&gt;</p>
-            <p style="margin:0 0 8px;color:#00FF94;font-size:12px;letter-spacing:2px;text-transform:uppercase;">Message</p>
-            <p style="margin:0;font-size:15px;line-height:1.6;color:#cfcfcf;white-space:pre-wrap;">{req.message}</p>
-          </td></tr>
-          <tr><td style="padding:16px 28px;border-top:1px solid #1f1f1f;color:#666;font-size:12px;">
-            Sent from your portfolio contact form
-          </td></tr>
-        </table>
-      </td></tr>
-    </table>
-    """
-
-    payload = {
-        "to": [OWNER_EMAIL],
-        "subject": f"Portfolio contact from {req.name}",
-        "html": html_content,
-        "from_name": EMAIL_FROM_NAME,
-        "contact_email": req.email,
-    }
-
-    email_sent = False
-    try:
-        async with httpx.AsyncClient(timeout=30) as http_client:
-            resp = await http_client.post(
-                f"{EMAIL_BASE_URL}/api/v1/email/send",
-                headers={"X-Email-Key": EMAIL_KEY},
-                json=payload,
-            )
-        resp.raise_for_status()
-        email_sent = True
-    except Exception as e:
-        # Best-effort email: the message is already persisted in Mongo, so the
-        # visitor is never blocked if the managed email provider is unavailable.
-        logger.error(f"Contact email send failed (message still saved): {e}")
-
     return {
         "status": "success",
-        "email_sent": email_sent,
         "message": "Thanks! Your message has been received.",
     }
 
@@ -229,22 +187,28 @@ LANGUAGE_MAP = {
     "hinglish": ("en-IN", "Hinglish (romanized Hindi mixed with English, written in Latin script)", True),
 }
 
-
 async def translate_text(text: str, language_name: str) -> str:
-    """Translate English source text into the target language using Claude."""
+    if not GROQ_API_KEY:
+        logger.warning("Translation skipped: GROQ_API_KEY not set")
+        return text
     try:
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=f"tts-translate-{uuid.uuid4()}",
-            system_message=(
-                "You are a professional translator. Translate the user's text into "
-                f"{language_name}. Output ONLY the translation, no quotes, no notes, "
-                "no transliteration in brackets. Keep proper nouns like 'Archi', "
-                "'AI/ML', 'RAG', 'Python' as-is."
-            ),
-        ).with_model("anthropic", "claude-sonnet-4-6")
-        result = await chat.send_message(UserMessage(text=text))
-        return (result or text).strip()
+        resp = await groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1024,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a professional translator. Translate the user's text into "
+                        f"{language_name}. Output ONLY the translation, no quotes, no notes, "
+                        "no transliteration in brackets. Keep proper nouns like 'Archi', "
+                        "'AI/ML', 'RAG', 'Python' as-is."
+                    ),
+                },
+                {"role": "user", "content": text},
+            ],
+        )
+        return resp.choices[0].message.content.strip()
     except Exception as e:
         logger.error(f"Translation failed: {e}")
         return text

@@ -2,10 +2,15 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail, Send, Loader2, Check, FileText, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
+import { send } from "@emailjs/browser";
 import { PROFILE } from "../../data/portfolio";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+const EMAILJS_SERVICE_ID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+const USE_EMAILJS = Boolean(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY);
 const ICONS = { Github, Linkedin, Mail };
 
 export const Contact = () => {
@@ -19,24 +24,42 @@ export const Contact = () => {
       return;
     }
     setStatus("sending");
+
     try {
-      const resp = await fetch(`${API}/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await resp.json();
-      if (!resp.ok) throw new Error(data.detail || "failed");
+      if (USE_EMAILJS) {
+        console.debug("EmailJS send", {
+          serviceId: EMAILJS_SERVICE_ID,
+          templateId: EMAILJS_TEMPLATE_ID,
+          publicKey: EMAILJS_PUBLIC_KEY,
+        });
+        await send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        }, EMAILJS_PUBLIC_KEY);
+      } else {
+        const resp = await fetch(`${API}/contact`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || "failed");
+      }
+
       setStatus("sent");
       toast.success("Message sent — Archi will get back to you soon.");
       setForm({ name: "", email: "", message: "" });
       setTimeout(() => setStatus("idle"), 3000);
     } catch (err) {
+      console.error("Contact send failed", err);
       setStatus("idle");
-      toast.error(typeof err.message === "string" ? err.message : "Failed to send. Try email directly.");
+      const errorText = err?.text || err?.message || "Failed to send. Try email directly.";
+      toast.error(errorText);
     }
   };
 
+  const emailServiceMode = USE_EMAILJS ? "EmailJS" : "Backend API";
   const field = "w-full border-b border-white/15 bg-transparent py-4 font-body text-lg text-white placeholder:text-zinc-600 transition-colors focus:border-[#00FF94] focus:outline-none";
 
   return (
@@ -75,6 +98,9 @@ export const Contact = () => {
             data-testid="contact-form"
             className="space-y-8"
           >
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/80">
+              Sending with <span className="font-semibold text-[#00FF94]">{emailServiceMode}</span>
+            </div>
             <input
               data-testid="contact-name"
               className={field}
