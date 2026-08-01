@@ -9,18 +9,17 @@ import logging
 import httpx
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr
-from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 from groq import AsyncGroq
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-groq_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+groq_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 # MongoDB connection
 mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")

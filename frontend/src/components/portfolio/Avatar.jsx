@@ -80,7 +80,7 @@ export const Avatar = () => {
   //    the FIRST interaction of ANY kind (mouse move, scroll, tap, key), which
   //    happens almost immediately, making it feel automatic.
   useEffect(() => {
-    const events = ["pointerdown", "mousemove", "wheel", "scroll", "keydown", "touchstart", "click"];
+    const events = ["pointerdown", "click", "wheel", "scroll", "keydown", "touchstart", "mousemove"];
 
     const removeAll = () => events.forEach((e) => window.removeEventListener(e, onInteract));
 
