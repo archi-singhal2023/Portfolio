@@ -109,7 +109,7 @@ export const Avatar = () => {
       clearTimeout(t);
       removeAll();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // dock on scroll
