@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field, EmailStr
 import uuid
 from datetime import datetime, timezone
 from groq import AsyncGroq
+import certifi
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ groq_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 # MongoDB connection
 mongo_url = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
 db = client[os.getenv("DB_NAME", "portfolio")]
 
 app = FastAPI()
