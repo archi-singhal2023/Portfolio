@@ -10,7 +10,7 @@ export const PROFILE = {
   headlineName: "ARCHI",
   subtitle: "Aspiring AI/ML Engineer",
   valueProp:
-    "Python-first AI/ML engineer specializing in Agentic AI & multi-agent systems — architecting autonomous LLM pipelines, production RAG platforms, and intelligent tooling that solves real-world problems.",
+    "AI/ML engineer specializing in Agentic AI & multi-agent systems, architecting autonomous LLM pipelines, production RAG platforms, and intelligent tooling that solves real-world problems.",
   heroTags: ["Python", "PyTorch", "TensorFlow", "AWS", "RAG", "GenAI/LLMs", "MLOps"],
   socials: [
     { label: "GitHub", handle: "archi-singhal2023", url: "https://github.com/archi-singhal2023", icon: "Github" },
@@ -57,13 +57,13 @@ export const PROJECTS = [
     index: "01",
     name: "Multi-Agent AI News Explainer",
     voiceSummary:
-      "This is Archi's Multi-Agent AI News Explainer — a six-agent pipeline that autonomously discovers news, verifies sources, and writes balanced explainers. It's deployed live on Render with dynamic, runtime query planning to optimize API usage.",
+      "This is Archi's Multi-Agent AI News Explainer, a six-agent pipeline that autonomously discovers news, verifies sources, and writes balanced explainers. It's deployed live on Render with dynamic, runtime query planning to optimize API usage.",
     period: "Jul 2026 — Present",
     status: "LIVE",
     problem:
       "News is fragmented and biased. Objective: an autonomous system that discovers current events, verifies sources, and synthesizes balanced, multi-angle explainers — with full attribution.",
     architecture:
-      "A 6-agent pipeline — Discovery, Triage, Researcher, Analyst, Editor, Classifier — with a Researcher that generates topic-specific search angles at runtime and a triage router that classifies stories by required depth to optimize API usage.",
+      "A 6-agent pipeline: Discovery, Triage, Researcher, Analyst, Editor, Classifier, with a Researcher that generates topic-specific search angles at runtime and a triage router that classifies stories by required depth to optimize API usage.",
     stack: ["Python", "Flask", "Groq API", "Tavily API", "Multi-Agent Orchestration", "Gunicorn", "Render"],
     metrics: [
       { value: "6", label: "Autonomous agents" },
@@ -76,7 +76,7 @@ export const PROJECTS = [
     index: "02",
     name: "RAG-Based Knowledge Management System",
     voiceSummary:
-      "This is Archi's RAG Knowledge Management System — a production PDF question-answering app built with LangChain and ChromaDB, using MMR retrieval for source-backed answers. The research behind it was published in the IJACECT journal in 2026.",
+      "This is Archi's RAG Knowledge Management System, a production PDF question-answering app built with LangChain and ChromaDB, using MMR retrieval for source-backed answers. The research behind it was published in the IJACECT journal in 2026.",
     period: "Jan 2026 — Mar 2026",
     status: "PUBLISHED",
     problem:
@@ -95,7 +95,7 @@ export const PROJECTS = [
     index: "03",
     name: "AI Photo Booth",
     voiceSummary:
-      "This is Archi's AI Photo Booth — a real-time computer vision app that snaps photos using blink and hand-gesture detection with MediaPipe, then builds a polaroid-style strip. It runs fully hands-free with a voice-guided countdown, no button clicks needed.",
+      "This is Archi's AI Photo Booth, a real-time computer vision app that snaps photos using blink and hand-gesture detection with MediaPipe, then builds a polaroid-style strip. It runs fully hands-free with a voice-guided countdown, no button clicks needed.",
     period: "2025",
     status: "CV",
     problem:
@@ -149,14 +149,14 @@ export const PLAYGROUND_SUGGESTIONS = [
 // Avatar assistant config
 export const LANGUAGES = [
   { key: "english", label: "English" },
-  { key: "hindi", label: "हिंदी" },
-  { key: "tamil", label: "தமிழ்" },
-  { key: "telugu", label: "తెలుగు" },
-  { key: "kannada", label: "ಕನ್ನಡ" },
-  { key: "odia", label: "ଓଡ଼ିଆ" },
-  { key: "bengali", label: "বাংলা" },
+  { key: "hindi", label: "Hindi" },
+  { key: "tamil", label: "Tamil" },
+  { key: "telugu", label: "Telgu" },
+  { key: "kannada", label: "Kannada" },
+  { key: "odia", label: "Odia" },
+  { key: "bengali", label: "Bengali" },
 ];
 
 export const AVATAR_INTRO =
-  "Welcome to the portfolio of Archi, an AI/ML Engineer. A creative mind with a strong teamwork spirit, Archi is looking for opportunities to apply her knowledge to solve real-world problems.";
+  "Welcome to the portfolio of Archi, an AIML Engineer. A creative mind with a strong teamwork spirit, Archi is looking for opportunities to apply her knowledge to solve real-world problems.";
 
